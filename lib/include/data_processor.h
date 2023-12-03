@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include <variant>
+#include <vector>
 
 class data_processor {
 private:
@@ -18,6 +19,7 @@ public:
 
     void read_data(std::string csv_path, std::map<std::string, std::string> col_types);
     void print_data();
+    void scatter_plot(std::vector<double> x_col, std::vector<double> y_col);
     void viz_1();
     data_processor();
     ~data_processor();

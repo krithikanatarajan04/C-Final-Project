@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "data_processor.h"
-
+#include "matplot/matplot.h"
 
 
 int main() {
@@ -17,7 +17,8 @@ int main() {
     };
 
     dp.read_data("../data/community-greenhouse-gas.csv", columnTypes);
-    dp.print_data();
+    //dp.print_data();
+    dp.viz_1();
 
 
 
