@@ -94,62 +94,40 @@ void data_processor::print_data() {
 }
 
 
-void data_processor::scatter_plot(std::vector<double> x_col, std::vector<double> y_col){
-    /* This function takes data and creates a line plot
+
+std::vector<double> data_processor::extract_column(std::string col_name){
+    /* This function returns a column of data
+     * Parameters:
+     * std::string - column name
+     * Returns:
+     * std::vector - column of data
      * */
-    // For a scatter plot
-    std::cout << "yay" << std::endl;
-    matplot::scatter(x_col, y_col);
-    matplot::title("Year vs Carbon Emissions");
-    matplot::xlabel("Year");
-    matplot::ylabel("Emissions (mt CO2e)");
-
-    // Display the plot
-    matplot::show();
-}
-
-void data_processor::viz_1(){
-    std::vector<double> years;
-    std::vector<double> emissions;
-
+    std::vector<double> col_data;
     for (const auto& row : data_map) {
 
-        auto year_iter = row.find("Year (Calendar Year)");
-        auto emissions_iter = row.find("GHG Emissions (mt CO2e)");
-
-        if (year_iter == row.end()) {
-            std::cerr << "Year key not found in row\n";
-            continue; // Skip this iteration
-        }
-        if (emissions_iter == row.end()) {
-            std::cerr << "Emissions key not found in row\n";
+        auto col_iter = row.find(col_name);
+        if (col_iter == row.end()) {
+            std::cerr << col_name << " not found in row\n";
             continue; // Skip this iteration
         }
 
-        if (std::holds_alternative<int>(year_iter->second) && std::holds_alternative<double>(emissions_iter->second)) {
-
-            years.push_back(std::get<int>(year_iter->second));
-            emissions.push_back(std::get<double>(emissions_iter->second));
+        if (std::holds_alternative<int>(col_iter->second)) {
+            col_data.push_back(std::get<int>(col_iter->second));
         }
     }
-
-    //scatter_plot(years,emissions);
+    return col_data;
 }
 
 
 
 
-void data_processor::clean_data() {
-    /* this function iterates through and cleans out the data and formats it in a way easy for
-     * visualization
-     * Parameters:
-     * Returns:
-     * */
 
-    //convert string into number(if needed)
-    //format number properly
 
-}
+
+
+
+
+
 
 
 

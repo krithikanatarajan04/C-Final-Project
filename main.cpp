@@ -17,8 +17,12 @@ int main() {
     };
 
     dp.read_data("../data/community-greenhouse-gas.csv", columnTypes);
+
     //dp.print_data();
     dp.viz_1();
+
+
+
 
 
 

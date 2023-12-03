@@ -19,8 +19,7 @@ public:
 
     void read_data(std::string csv_path, std::map<std::string, std::string> col_types);
     void print_data();
-    void scatter_plot(std::vector<double> x_col, std::vector<double> y_col);
-    void viz_1();
+    std::vector<double> extract_column(std::string col_name);
     data_processor();
     ~data_processor();
 

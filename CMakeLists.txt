@@ -6,7 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_executable(${PROJECT_NAME}
         main.cpp
         lib/src/data_processor.cpp
-        lib/include/data_processor.h)
+        lib/include/data_processor.h
+        lib/src/visualization.cpp
+        lib/include/visualization.h)
 
 
 add_subdirectory(matplotplusplus-master)
