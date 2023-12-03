@@ -11,10 +11,13 @@ add_executable(${PROJECT_NAME}
 
 add_subdirectory(matplotplusplus-master)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC matplot)
-
+target_include_directories(${PROJECT_NAME} PRIVATE
+        lib/include
+        matplotplusplus-master/source/matplot)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE matplot Threads::Threads)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 
 target_include_directories(${PROJECT_NAME} PRIVATE lib/include)

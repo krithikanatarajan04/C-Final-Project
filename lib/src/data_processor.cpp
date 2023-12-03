@@ -8,6 +8,7 @@
 #include <sstream>
 #include <map>
 #include <variant>
+#include <matplot/matplot.h>
 
 data_processor::data_processor() {
 
@@ -90,6 +91,14 @@ void data_processor::print_data() {
 
     }
 }
+
+
+void data_processor::viz_1(){
+    /* This function takes data and creates a line plot
+     * */
+
+}
+
 
 
 
