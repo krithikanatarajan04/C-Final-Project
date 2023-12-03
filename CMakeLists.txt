@@ -9,9 +9,9 @@ add_executable(${PROJECT_NAME}
         lib/include/data_processor.h)
 
 
-add_subdirectory(matplotplusplus-master/source)
-add_executable(my_target main.cpp)
-target_link_libraries(my_target PUBLIC matplot)
+add_subdirectory(matplotplusplus-master)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC matplot)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)

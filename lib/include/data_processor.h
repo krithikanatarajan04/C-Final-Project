@@ -18,6 +18,7 @@ public:
 
     void read_data(std::string csv_path, std::map<std::string, std::string> col_types);
     void print_data();
+
     data_processor();
     ~data_processor();
 
