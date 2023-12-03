@@ -8,7 +8,9 @@
 #include <sstream>
 #include <map>
 #include <variant>
-#include <matplot/matplot.h>
+#include "matplot/matplot.h"
+#include <vector>
+
 
 data_processor::data_processor() {
 
@@ -40,7 +42,6 @@ void data_processor::read_data(std::string csv_path, std::map<std::string, std::
         while (std::getline(line_stream, line_cell, ',')) {
             if (column_index < headers.size()) {
                 const std::string& current_header = headers[column_index];
-                std::cout << current_header << std::endl;
                 if (col_types.find(current_header) != col_types.end()) {
                     if (col_types.at(current_header) == "int") {
                         data_row[current_header] = std::stoi(line_cell);
@@ -93,10 +94,46 @@ void data_processor::print_data() {
 }
 
 
-void data_processor::viz_1(){
+void data_processor::scatter_plot(std::vector<double> x_col, std::vector<double> y_col){
     /* This function takes data and creates a line plot
      * */
+    // For a scatter plot
+    std::cout << "yay" << std::endl;
+    matplot::scatter(x_col, y_col);
+    matplot::title("Year vs Carbon Emissions");
+    matplot::xlabel("Year");
+    matplot::ylabel("Emissions (mt CO2e)");
 
+    // Display the plot
+    matplot::show();
+}
+
+void data_processor::viz_1(){
+    std::vector<double> years;
+    std::vector<double> emissions;
+
+    for (const auto& row : data_map) {
+
+        auto year_iter = row.find("Year (Calendar Year)");
+        auto emissions_iter = row.find("GHG Emissions (mt CO2e)");
+
+        if (year_iter == row.end()) {
+            std::cerr << "Year key not found in row\n";
+            continue; // Skip this iteration
+        }
+        if (emissions_iter == row.end()) {
+            std::cerr << "Emissions key not found in row\n";
+            continue; // Skip this iteration
+        }
+
+        if (std::holds_alternative<int>(year_iter->second) && std::holds_alternative<double>(emissions_iter->second)) {
+
+            years.push_back(std::get<int>(year_iter->second));
+            emissions.push_back(std::get<double>(emissions_iter->second));
+        }
+    }
+
+    //scatter_plot(years,emissions);
 }
 
 
