@@ -30,4 +30,18 @@ void visualization::scatter_plot(std::vector<double> x_col, std::vector<double> 
     matplot::show();
 }
 
+void histogram(std::vector<double> data, const std::string& title, const std::string& x_label, const std::string& y_label){
+    /* THis function takes  column of data and creates a histogram
+     * Parameter:
+     * std::vector - data to plot
+     * */
+    matplot::hist(data);
+    matplot::title(title);
+    matplot::xlabel(x_label);
+    matplot::ylabel(y_label);
+
+    // Display the plot
+    matplot::show();
+}
+
 

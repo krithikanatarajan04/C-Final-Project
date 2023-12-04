@@ -8,7 +8,9 @@ add_executable(${PROJECT_NAME}
         lib/src/data_processor.cpp
         lib/include/data_processor.h
         lib/src/visualization.cpp
-        lib/include/visualization.h)
+        lib/include/visualization.h
+        lib/src/Analysis.cpp
+        lib/include/Analysis.h)
 
 
 add_subdirectory(matplotplusplus-master)
