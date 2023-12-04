@@ -8,6 +8,7 @@
 #include <map>
 #include <variant>
 #include <vector>
+#include <iostream>
 
 class data_processor {
 private:
@@ -19,7 +20,33 @@ public:
 
     void read_data(std::string csv_path, std::map<std::string, std::string> col_types);
     void print_data();
-    std::vector<double> extract_column(std::string col_name);
+
+    data_processor(std::vector<std::map<std::string, std::variant<int, double, std::string>>>);
+    template <typename T>
+    std::vector<T> extract_column(std::string col_name){
+        /* This function returns a column of data
+         * Parameters:
+         * std::string - column name
+         * Returns:
+         * std::vector - column of data
+         * */
+        std::vector<T> col_data;
+        for (const auto& row : data_map) {
+            auto col_iter = row.find(col_name);
+            if (col_iter == row.end()) {
+                std::cerr << col_name << " not found in row\n";
+                continue; // Skip this iteration
+            }
+
+            if (std::holds_alternative<T>(col_iter->second)) {
+                col_data.push_back(std::get<T>(col_iter->second));
+            }
+        }
+        return col_data;
+    }
+
+    std::vector<std::map<std::string, std::variant<int, double, std::string>>> filter_data(std::string col_name,std::variant<int, double, std::string> col_value);
+
     data_processor();
     ~data_processor();
 

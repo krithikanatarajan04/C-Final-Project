@@ -15,10 +15,14 @@
 data_processor::data_processor() {
 
 }
+data_processor::data_processor(std::vector<std::map<std::string, std::variant<int, double, std::string>>> data){
+    data_map = data;
+}
 
 data_processor::~data_processor() {
 
 }
+
 
 void data_processor::read_data(std::string csv_path, std::map<std::string, std::string> col_types) {
     io::LineReader in(csv_path);
@@ -93,30 +97,29 @@ void data_processor::print_data() {
     }
 }
 
-
-
-std::vector<double> data_processor::extract_column(std::string col_name){
-    /* This function returns a column of data
-     * Parameters:
-     * std::string - column name
-     * Returns:
-     * std::vector - column of data
+std::vector<std::map<std::string, std::variant<int, double, std::string>>> data_processor::filter_data(std::string col_name,std::variant<int, double, std::string> col_value) {
+    /* Given a column name and the associated value to filter by, this function returns
+     * a new data map object filtering for the rows that have the desired value
      * */
-    std::vector<double> col_data;
-    for (const auto& row : data_map) {
-
+    data_processor new_data;
+    for (const auto &row: data_map) {
         auto col_iter = row.find(col_name);
-        if (col_iter == row.end()) {
-            std::cerr << col_name << " not found in row\n";
-            continue; // Skip this iteration
-        }
-
-        if (std::holds_alternative<int>(col_iter->second)) {
-            col_data.push_back(std::get<int>(col_iter->second));
+        if (col_iter != row.end()) {
+            // Check if this row has the specified value
+            if (col_iter->second.index() == col_value.index() && col_iter->second == col_value){
+                new_data.data_map.push_back(row);
+            }
         }
     }
-    return col_data;
+    return new_data.data_map;
 }
+
+
+
+
+
+
+
 
 
 

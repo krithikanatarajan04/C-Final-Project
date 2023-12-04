@@ -7,6 +7,10 @@
 #include <iostream>
 #include <string>
 
+visualization::visualization(){}
+
+visualization::~visualization(){}
+
 void visualization::scatter_plot(std::vector<double> x_col, std::vector<double> y_col, const std::string& title, const std::string& x_label, const std::string& y_label){
     /*This function creates a scatter based two vectors containing x coordinates and y
      * coordinates
@@ -18,9 +22,9 @@ void visualization::scatter_plot(std::vector<double> x_col, std::vector<double> 
 
     std::cout << "yay" << std::endl;
     matplot::scatter(x_col, y_col);
-    matplot::title("Year vs Carbon Emissions");
-    matplot::xlabel("Year");
-    matplot::ylabel("Emissions (mt CO2e)");
+    matplot::title(title);
+    matplot::xlabel(x_label);
+    matplot::ylabel(y_label);
 
     // Display the plot
     matplot::show();
