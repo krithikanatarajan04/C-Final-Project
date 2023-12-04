@@ -16,7 +16,8 @@ public:
     visualization();
     ~visualization();
     void scatter_plot(std::vector<double> x_col, std::vector<double> y_col, const std::string& title = "", const std::string& x_label = "", const std::string& y_label = "");
-    void histogram(std::vector<double> data,const std::string& title = "", const std::string& x_label = "", const std::string& y_label = "");
+
+    void histogram(std::vector<double> data, const std::string& title = "", const std::string& x_label = "", const std::string& y_label = "");
 
 
 };

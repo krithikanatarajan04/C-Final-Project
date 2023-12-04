@@ -45,7 +45,7 @@ public:
         return col_data;
     }
 
-    std::vector<std::map<std::string, std::variant<int, double, std::string>>> filter_data(std::string col_name,std::variant<int, double, std::string> col_value);
+    data_processor filter_data(std::string col_name,std::variant<int, double, std::string> col_value);
 
     data_processor();
     ~data_processor();

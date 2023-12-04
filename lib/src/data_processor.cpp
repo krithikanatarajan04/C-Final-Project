@@ -97,7 +97,7 @@ void data_processor::print_data() {
     }
 }
 
-std::vector<std::map<std::string, std::variant<int, double, std::string>>> data_processor::filter_data(std::string col_name,std::variant<int, double, std::string> col_value) {
+data_processor data_processor::filter_data(std::string col_name,std::variant<int, double, std::string> col_value) {
     /* Given a column name and the associated value to filter by, this function returns
      * a new data map object filtering for the rows that have the desired value
      * */
@@ -111,7 +111,7 @@ std::vector<std::map<std::string, std::variant<int, double, std::string>>> data_
             }
         }
     }
-    return new_data.data_map;
+    return data_map;
 }
 
 

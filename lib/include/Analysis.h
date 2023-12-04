@@ -7,8 +7,16 @@
 
 
 class Analysis {
+
+
+public:
     Analysis();
     ~Analysis();
+    void Community_Greenhouse_gas();
+
+    void local_government_operation_fuels();
+
+    void local_government_operation_greenhouse_gas();
 };
 
 
