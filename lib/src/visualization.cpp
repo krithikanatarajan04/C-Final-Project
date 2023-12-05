@@ -20,7 +20,6 @@ void visualization::scatter_plot(std::vector<double> x_col, std::vector<double> 
      * Returns:
      * */
 
-    std::cout << "yay" << std::endl;
     matplot::scatter(x_col, y_col);
     matplot::title(title);
     matplot::xlabel(x_label);
@@ -36,7 +35,6 @@ void visualization::histogram(std::vector<double> data, const std::string& title
      * std::vector - data to plot
      * */
 
-    std::cout<<"yay" <<std::endl;
     matplot::hist(data);
     matplot::title(title);
     matplot::xlabel(x_label);
