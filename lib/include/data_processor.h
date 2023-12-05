@@ -17,14 +17,20 @@ private:
     std::map<std::string, std::string> COL_TYPES;
     std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>> REPLACEMENTS;
 
+    void assign_data(
+            std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>> &data_row,
+            std::string line_cell, size_t column_index);
+
+    std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>
+    typecast_value(std::string header, const std::string value);
 
 public:
     std::map<std::string, std::string> get_col_types();
 
     std::vector<std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>> data_map;
 
-    void read_data(std::string csv_path, std::map<std::string, std::string> col_types,
-                   const std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string> >>> replacements = {});
+    std::vector<std::string> parse_csv_line(const std::string& line);
+    void read_data(std::string csv_path,std::map<std::string, std::string> col_types, const std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string> >>> replacements = {});
     //map: key:column name, value: pair - (value to replace, new value(int,double,string, optional int double or string)
 
 
@@ -69,12 +75,7 @@ public:
     void replace_data(size_t row_index, const std::string &col_name, const std::string &rep_val,
                       const std::variant<int, double, std::string> &new_val);
 
-    void assign_data(
-            std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>> &data_row,
-            std::string line_cell, size_t column_index);
 
-    std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>
-    typecast_value(std::string header, const std::string value);
 
 };
 

@@ -44,6 +44,7 @@ std::variant<int,double,std::string,std::optional<int>,std::optional<double>,std
         auto type_it = COL_TYPES.find(header);
         if (type_it != COL_TYPES.end()) {
             const std::string& type = type_it->second;
+            std::cout << type <<std::endl;
             if (type == "int") {
                 return std::stoi(value);
             } else if (type == "double") {
@@ -52,28 +53,30 @@ std::variant<int,double,std::string,std::optional<int>,std::optional<double>,std
                 return value; // Default to string
             }
         }
+        else{
+            return value; //no type specified so automatically returns as a string
+        }
     }
 }
 
+std::vector<std::string> data_processor::parse_csv_line(const std::string& line){
+    std::vector<std::string> fields;
+    std::string field;
+    bool in_quotes = false;
 
-void data_processor::assign_data(std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>& data_row,
-                                 std::string line_cell, size_t column_index){
-    /* This function adds each new data point to the corresponding map
-    * Parameters:
-    * std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>,
-    * std::optional<std::string>>>& data row - reference to a std::map to add new key value pair to
-    * std::string - data point in string form
-    * size_t - column index to understand current header
-    */
-
-    //find what index column is on and store that header
-    if (column_index < headers.size()){
-        const std::string &current_header = headers[column_index];
-        //add data point to map for the row
-        data_row[current_header] = typecast_value(current_header, line_cell);
+    for (char ch : line) {
+        if (ch == '"') {
+            in_quotes = !in_quotes;  // Toggle the in_quotes flag
+        } else if (ch == ',' && !in_quotes) {
+            fields.push_back(field);
+            field.clear();
+        } else {
+            field.push_back(ch);
         }
     }
-
+    fields.push_back(field);  // Add the last field
+    return fields;
+}
 
 
 void data_processor::read_data(std::string csv_path, std::map<std::string, std::string> col_types,
@@ -85,6 +88,9 @@ void data_processor::read_data(std::string csv_path, std::map<std::string, std::
      * std::map<std::string, std::pair<std::string,std::variant<int, double, std::string, std::optional<int>,std::optional<double>,std::optional<std::string>>>> - if any of the values need to be replaced
      * (KEY - Column Name, VALUE - Pair:(value to REPLACE, value to replace WITH (this is of type std::variant))
      * */
+    //initialize CSV Reader object
+    //fixed maximum columns
+    const size_t MAX_COLUMNS = 10;
 
     //read csv line by line
     io::LineReader in(csv_path);
@@ -98,6 +104,8 @@ void data_processor::read_data(std::string csv_path, std::map<std::string, std::
     while (std::getline(headerStream, headerCell, ',')) {
         headers.push_back(headerCell);
     }
+
+
     // Iterate through the CSV file
     while (char *line = in.next_line()) {
         // Initialize row of data and column counter
@@ -105,11 +113,14 @@ void data_processor::read_data(std::string csv_path, std::map<std::string, std::
         size_t column_index = 0;
         std::stringstream line_stream(line);
         std::string line_cell;
-
         //traverse through data in each row
-        while (std::getline(line_stream, line_cell, ',')) {
-            assign_data(data_row,line_cell,column_index);
-        }
+
+        std::vector<std::string> row = parse_csv_line(line);
+            for (size_t i = 0; i < headers.size(); ++i) {
+                //std::cout << "Header: " <<headers[i] << std::endl;
+                //std::cout <<  "Line Cell: " << row[i] << std::endl;
+                data_row[headers[i]] = typecast_value(headers[i], row[i]);
+            }
         data_map.push_back(data_row);
     }
 }
@@ -119,32 +130,52 @@ void data_processor::read_data(std::string csv_path, std::map<std::string, std::
 
 
 void data_processor::print_data() {
-    /*This function prints the csv data
+    /*This function prints the csv data in a readable format
      * */
+    int idx=0;
     for (const auto &data_row: data_map) {
+        std::cout << "Row: " << idx << " | ";
         for (const auto &pair: data_row) {
             const std::string &key = pair.first;
-
-            // Use std::visit to access the value based on its type in the variant
-            std::cout << "Key: " << key << ", Value: ";
-
-            std::visit([&](auto &&value) {
-                using T = std::decay_t<decltype(value)>;
-
-                if constexpr (std::is_same_v<T, int>) {
-                    std::cout << value << " (int)";
-                } else if constexpr (std::is_same_v<T, double>) {
-                    std::cout << value << " (double)";
-                } else if constexpr (std::is_same_v<T, std::string>) {
-                    std::cout << value << " (string)";
+            const auto & val = pair.second;
+            std::cout << key << ": ";
+            if (const auto *value = std::get_if<std::string>(&val)) {
+                std::cout << *value;
+            } else if (const auto *value = std::get_if<int>(&val)) {
+                std::cout << *value;
+            } else if (const auto *value = std::get_if<double>(&val)) {
+                std::cout << *value;
+            } else if (const auto *value = std::get_if<std::optional<int>>(&val)) {
+                if (value->has_value()) {
+                    std::cout << value->value();
+                } else {
+                    std::cout << "N/A";
                 }
-            }, pair.second);
+            } else if (const auto *value = std::get_if<std::optional<double>>(&val)) {
+                if (value->has_value()) {
+                    std::cout << value->value();
+                } else {
+                    std::cout << "N/A";
+                }
+            } else if (const auto *value = std::get_if<std::optional<std::string>>(&val)) {
+                if (value->has_value()) {
+                    std::cout << value->value();
+                } else {
+                    std::cout << "N/A";
+                }
+            }
+            else {
+                std::cout << "Unknown type";
+            }
 
-            std::cout << std::endl;
+            std::cout << " | ";
         }
-
+        std::cout << "" << std::endl;
+        idx++;
+        }
+        std::cout << "" << std::endl;
     }
-}
+
 
 
 
