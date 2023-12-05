@@ -52,10 +52,22 @@ void Analysis::Community_Greenhouse_gas(){
             {"GHG Emissions (t CO2e)", {"-", std::optional<double>{}}}
     };
 
-    local_gov_greenhouse_gas.read_data("../data/local-government-operations-greenhouse-gas.csv", COL_TYPES_1, REPLACEMENTS);
+    //local_gov_greenhouse_gas.read_data("../data/local-government-operations-greenhouse-gas.csv", COL_TYPES_1, REPLACEMENTS);
 
-    local_gov_greenhouse_gas.print_data();
+    //local_gov_greenhouse_gas.print_data();
 
+    //LOCAL GOVERNMENT OPERATIONS FUELS
+    data_processor local_gov_fuels;
+    std::map<std::string, std::string> COL_TYPE_FUELS = {
+            {"Year (Fiscal Year)", "double"},
+            {"Quantity", "double"}
+    };
+    std::map<std::string, std::pair<std::string,std::variant<int, double, std::string, std::optional<int>,std::optional<double>,std::optional<std::string>>>> REP_FUELS = {
+            {"Quantity", {"-", std::optional<double>{}}}
+    };
+
+    local_gov_fuels.read_data("../data/local-government-operations-fuels.csv", COL_TYPE_FUELS, REP_FUELS);
+    local_gov_fuels.print_data();
     //COMBINE DATASETS USING SIMILAR HEADERS
 
 

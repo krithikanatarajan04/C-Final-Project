@@ -44,7 +44,6 @@ std::variant<int,double,std::string,std::optional<int>,std::optional<double>,std
         auto type_it = COL_TYPES.find(header);
         if (type_it != COL_TYPES.end()) {
             const std::string& type = type_it->second;
-            std::cout << type <<std::endl;
             if (type == "int") {
                 return std::stoi(value);
             } else if (type == "double") {
@@ -105,7 +104,6 @@ void data_processor::read_data(std::string csv_path, std::map<std::string, std::
         headers.push_back(headerCell);
     }
 
-
     // Iterate through the CSV file
     while (char *line = in.next_line()) {
         // Initialize row of data and column counter
@@ -117,8 +115,6 @@ void data_processor::read_data(std::string csv_path, std::map<std::string, std::
 
         std::vector<std::string> row = parse_csv_line(line);
             for (size_t i = 0; i < headers.size(); ++i) {
-                //std::cout << "Header: " <<headers[i] << std::endl;
-                //std::cout <<  "Line Cell: " << row[i] << std::endl;
                 data_row[headers[i]] = typecast_value(headers[i], row[i]);
             }
         data_map.push_back(data_row);
