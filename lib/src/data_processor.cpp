@@ -202,6 +202,7 @@ data_processor data_processor::filter_data(const std::string& col_name, const T&
                 // Compare only if the types are the same and includes or excludes accordingly
                 if constexpr (std::is_same_v<VariantType, ValueType>) {
                     bool valueMatches = (variant_value == col_value);
+
                     if ((valueMatches && !exclude) || (!valueMatches && exclude)) {
                         new_data.data_map.push_back(row);
                     }
@@ -212,11 +213,24 @@ data_processor data_processor::filter_data(const std::string& col_name, const T&
     return new_data;
 }
 
-// Explicit instantiation for std::string
-template data_processor data_processor::filter_data<std::string>(const std::string& col_name, const std::string& col_value, bool exclude);
+// Explicit instantiations
+template data_processor data_processor::filter_data<std::string>(const std::string&, const std::string&, bool);
 
-// Explicit instantiation for std::optional<double>
-template data_processor data_processor::filter_data<std::optional<double>>(const std::string& col_name, const std::optional<double>& col_value, bool exclude);
+
+template data_processor data_processor::filter_data<int>(const std::string&, const int&, bool);
+
+
+template data_processor data_processor::filter_data<double>(const std::string&, const double&, bool);
+
+
+template data_processor data_processor::filter_data<std::optional<int>>(const std::string&, const std::optional<int>&, bool);
+
+
+template data_processor data_processor::filter_data<std::optional<double>>(const std::string&, const std::optional<double>&, bool);
+
+
+template data_processor data_processor::filter_data<std::optional<std::string>>(const std::string&, const std::optional<std::string>&, bool);
+
 
 
 
