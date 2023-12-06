@@ -169,6 +169,24 @@ void data_processor::print_data() {
         }
         std::cout << "" << std::endl;
     }
+
+
+// Copy constructor
+data_processor::data_processor(const data_processor& other)
+: data_map(other.data_map), COL_TYPES(other.COL_TYPES) {}
+
+data_processor& data_processor::operator=(const data_processor& other){
+    if (this != &other) { // Protect against self-assignment
+        // Copy each member variable from 'other' to 'this'
+        data_map = other.data_map;
+        COL_TYPES = other.COL_TYPES;
+
+        // For other resources (like dynamic memory), release the current resources
+        // and allocate new ones, copying the content from 'other'
+    }
+    return *this;
+}
+
 template <typename T>
 bool data_processor::check_variant_type(const std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> variant) {
     return std::holds_alternative<T>(variant);
@@ -211,6 +229,12 @@ data_processor data_processor::filter_data(const std::string& col_name, const T&
             }, col_iter->second);
         }
     }
+    //replace COL_TYPES (if needed)
+    for(auto header : COL_TYPES){
+        new_data.COL_TYPES[header.first] = header.second;
+    }
+    new_data.print_data();
+    std::cout << new_data.data_map.size() << std::endl;
     return new_data;
 }
 
@@ -297,6 +321,13 @@ void data_processor::update_header(int header_idx, std::string new_header){
      * int header_idx - index to replace at
      * std::string new_header - what to replace header with
      * */
+
+    //replace COL_TYPES (if needed)
+    for(auto header : COL_TYPES){
+        if(header.first == headers[header_idx]){
+            COL_TYPES[new_header] = header.second;
+        }
+    }
     this->headers[header_idx] = new_header;
 }
 
@@ -315,7 +346,76 @@ data_processor data_processor::merge_data(data_processor set_1, data_processor s
 
     combined_sets.add_data(set_1,common_headers);
     combined_sets.add_data(set_2,common_headers);
+
+    // Initialize or validate COL_TYPES for combined_sets
+    for (const auto& header : common_headers) {
+        auto it1 = set_1.COL_TYPES.find(header);
+        auto it2 = set_2.COL_TYPES.find(header);
+
+        // Check if the header exists in both set_1 and set_2 COL_TYPES
+        if (it1 != set_1.COL_TYPES.end() && it2 != set_2.COL_TYPES.end()){
+            combined_sets.COL_TYPES[header] = it1->second;
+        }
+    }
     return combined_sets;
+}
+
+template <typename T>
+void data_processor::add_col(const std::vector<T>& vec, const std::string& col_name){
+    // initialize data_map to correct number of rows if empty
+    if (this->data_map.empty()) {
+        this->data_map.resize(vec.size());
+    }
+
+    // Ensure data_map has enough rows to add new column data
+    if (this->data_map.size() < vec.size()) {
+        // Expand the data_map to accommodate new rows
+        this->data_map.resize(vec.size());
+    }
+
+    // Iterate through the vector and add more column data in each row
+    for (size_t i = 0; i < vec.size(); i++) {
+        this->data_map[i][col_name] = vec[i];
+    }
+}
+
+// Explicit instantiations
+template void data_processor::add_col<int>(const std::vector<int>&, const std::string&);
+template void data_processor::add_col<double>(const std::vector<double>&, const std::string&);
+template void data_processor::add_col<std::string>(const std::vector<std::string>&, const std::string&);
+
+
+data_processor data_processor::aggregation(const std::vector<std::string>& col_names, const std::string& sum_col) {
+    data_processor sub_data;
+
+
+    for (const auto& col_name : col_names) {
+        auto it = COL_TYPES.find(col_name);
+        if (it != COL_TYPES.end()) {
+            if (it->second == "int") {
+                std::vector<int> int_vec = extract_column<int>(col_name);
+                sub_data.add_col(int_vec, col_name);
+            } else if (it->second == "double") {
+                std::vector<double> double_vec = extract_column<double>(col_name);
+                for(auto v : double_vec){
+                    std::cout << v << std::endl;
+                }
+                sub_data.add_col(double_vec, col_name);
+            } else {
+                std::vector<std::string> string_vec = extract_column<std::string>(col_name);
+                sub_data.add_col(string_vec, col_name);
+            }
+        } else {
+            std::vector<std::string> default_vec = extract_column<std::string>(col_name);
+            sub_data.add_col(default_vec, col_name);
+        }
+    }
+    sub_data.print_data();
+    //sum by specified column
+    //data_processor aggregate;
+
+
+    return sub_data;
 }
 
 
