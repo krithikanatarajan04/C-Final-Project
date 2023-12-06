@@ -191,10 +191,6 @@ data_processor& data_processor::operator=(const data_processor& other){
     return *this;
 }
 
-template <typename T>
-bool data_processor::check_variant_type(const std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> variant) {
-    return std::holds_alternative<T>(variant);
-}
 
 // Define a helper function to compare values of different types
 template <typename T, typename U>
@@ -220,6 +216,14 @@ bool compare_values(const T& col_value, const U& variant_value, bool exclude) {
 
 template <typename T>
 data_processor data_processor::filter_data(const std::string& col_name, const T& col_value, bool exclude) {
+    /* This function filters data based on a column name a value in that column. It can either include or exclude that value
+     * Parameters:
+     * std::string - col name
+     * col value - variable type
+     * excluded(set to false) - whether or not to look for and add to or remove from data map
+     * Returns:
+     * data_processor
+     * */
     data_processor new_data;
 
     for (const auto& row : data_map) {
@@ -253,6 +257,7 @@ template data_processor data_processor::filter_data<std::optional<double>>(const
 
 
 template data_processor data_processor::filter_data<std::optional<std::string>>(const std::string&, const std::optional<std::string>&, bool);
+
 
 std::vector<std::string> data_processor::get_headers(){
     /* This function returns the headers for a data set
@@ -296,6 +301,8 @@ std::vector<std::string> find_common_headers(std::vector<std::string> head_1, st
 void data_processor::add_data(data_processor set, std::vector<std::string> common_headers){
     /*This function traverse through a dataset and adds it to another one
      * Parameters:
+     * data processor - data
+     * std::vector<std::string> common_headers - between the two datasets
      * */
     // Traverse through new_data's data_map
     for (const auto& row : set.data_map) {
@@ -361,6 +368,11 @@ data_processor data_processor::merge_data(data_processor set_1, data_processor s
 
 template <typename T>
 void data_processor::add_col(const std::vector<T>& vec, const std::string& col_name){
+    /* This function adds a column to datamap
+     * Parameters:
+     * std:Vector<T> vec - data to add
+     * std::string col name - name of column (or key)
+     * */
 
     // Ensure data_map has enough rows to add new column data
 
@@ -382,6 +394,13 @@ template void data_processor::add_col<std::string>(const std::vector<std::string
 
 
 data_processor data_processor::aggregation(const std::vector<std::string>& col_names, const std::string& sum_col) {
+    /* This function aggregates data based on columns provided
+     * Parameters:
+     * std::vector<std::string>> col names
+     * std::string - column to sum on
+     * Returns:
+     * data_processor
+     * */
     std::vector<std::string> all_cols;
     all_cols = col_names;
     all_cols.push_back(sum_col);
@@ -431,13 +450,12 @@ data_processor data_processor::aggregation(const std::vector<std::string>& col_n
             if (match) {
                 // Perform addition based on the actual types within the variants
                 if (r[sum_col].index() == 0 && row[sum_col].index() == 0) {
-                    // Both values are of type int
+
                     std::get<int>(r[sum_col]) += std::get<int>(row[sum_col]);
                 } else if (r[sum_col].index() == 1 && row[sum_col].index() == 1) {
-                    // Both values are of type double
+
                     std::get<double>(r[sum_col]) += std::get<double>(row[sum_col]);
                 }
-                // Add more cases for other types as needed...
 
                 is_there = true;
                 break;
