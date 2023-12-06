@@ -8,7 +8,7 @@
 
 int main() {
     Analysis envr_analysis;
-    envr_analysis.Community_Greenhouse_gas();
+    envr_analysis.emissions_over_time_by_sector();
 
     return 0;
 }

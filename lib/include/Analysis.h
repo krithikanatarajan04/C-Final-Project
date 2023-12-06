@@ -15,11 +15,10 @@ private:
 public:
     Analysis();
     ~Analysis();
-    void Community_Greenhouse_gas();
+    void emissions_over_time_by_sector();
 
     void local_government_operation_fuels();
 
-    void local_government_operation_greenhouse_gas();
 };
 
 

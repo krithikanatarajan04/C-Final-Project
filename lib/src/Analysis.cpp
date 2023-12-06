@@ -32,7 +32,7 @@ void Analysis::unit_standardization(data_processor& dataset) {
     for (auto& record : dataset.data_map) {
         auto it = record.find("GHG Emissions (t CO2e)");
         if (it != record.end() && std::holds_alternative<double>(it->second)) {
-            it->second = std::get<double>(it->second) / 1000;  // Convert mt CO2e to mt CO2e
+            it->second = std::get<double>(it->second) / 1000;  // Convert t CO2e to mt CO2e
         }
     }
 
@@ -42,6 +42,8 @@ data_processor Analysis::combine_dataset(data_processor set_1, data_processor se
     /* This function combines two datasets into one by looking at the common headers
      * Parameter:
      * data_processor - datasets one and two
+     * Returns:
+     * data_processer
      * */
 
     //convert the units to mtCO2E
@@ -66,7 +68,7 @@ data_processor Analysis::combine_dataset(data_processor set_1, data_processor se
 }
 
 
-void Analysis::Community_Greenhouse_gas(){
+void Analysis::emissions_over_time_by_sector(){
     /* THis function conducts overview Analysis on the Community Greenhouse Gas CSV
      * */
     data_processor comm_greenhouse_gas;
