@@ -64,7 +64,8 @@ public:
         return col_data;
     }
 
-    data_processor filter_data(std::string col_name,std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> col_value, bool out);
+    template <typename T>
+    data_processor filter_data(const std::string& col_name, const T& col_value, bool exclude=false);
     data_processor();
     ~data_processor();
 
@@ -73,7 +74,8 @@ public:
     void replace_data(size_t row_index, const std::string &col_name, const std::string &rep_val,
                       const std::variant<int, double, std::string> &new_val);
 
-
+    template <typename T>
+    bool check_variant_type(const std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> variant);
 
 };
 

@@ -68,7 +68,8 @@ void Analysis::Community_Greenhouse_gas(){
 
     local_gov_fuels.read_data("../data/local-government-operations-fuels.csv", COL_TYPE_FUELS, REP_FUELS);
     local_gov_fuels.print_data();
-
+    data_processor filter_sector = local_gov_fuels.filter_data<std::string>("Sector","Buildings", false);
+    filter_sector.print_data();
 
     //COMBINE DATASETS USING SIMILAR HEADERS
 

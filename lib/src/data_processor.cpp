@@ -168,38 +168,57 @@ void data_processor::print_data() {
         }
         std::cout << "" << std::endl;
     }
+template <typename T>
+bool data_processor::check_variant_type(const std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> variant) {
+    return std::holds_alternative<T>(variant);
+}
 
-data_processor data_processor::filter_data(std::string col_name,std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> col_value, bool out) {
 
-    /* Given a column name and the associated value to filter by, this function returns
-     * a new data map object filtering for the rows that have the desired value
+
+template <typename T>
+data_processor data_processor::filter_data(const std::string& col_name, const T& col_value, bool exclude) {
+    /* This function filters data for a certain value in a given column.
+     * It can either save those rows or remove those rows into a new data object
      * Parameters:
-     * std::string col_name - column to search for value
-     * std::variant col_value - the value to filter by
-     * bool out (set to false) - whether to filter all rows WITH value or WITHOUT value
+     * std::string col_name - name of the column to search through
+     * const& T - the value to filter by (can be any of supported variants)
+     * bool exclude (automatically set to false) - to execlude rows with given value or include rows with given value
+     *
      * Returns:
-     * data_processor - new data processor object with filtered data map
+     * data_processor - new data_map that filters desired values
      * */
-
     data_processor new_data;
-    for (const auto &row: data_map) {
+    bool is_value;
+    //iterate through current map
+    for (const auto& row : data_map) {
         auto col_iter = row.find(col_name);
         if (col_iter != row.end()) {
-            // Check if this row has the specified value
-            if(out){
-                if (col_iter->second != col_value){
-                    new_data.data_map.push_back(row);
+            //check the type of each variant and sees if it is equal
+            //if types are equal, check if the values itself are equal
+            std::visit([&](const auto& variant_value) {
+                using VariantType = std::decay_t<decltype(variant_value)>; // Deduced type in the variant
+                using ValueType = std::decay_t<decltype(col_value)>;      // Type of col_value
+
+                // Compare only if the types are the same and includes or excludes accordingly
+                if constexpr (std::is_same_v<VariantType, ValueType>) {
+                    bool valueMatches = (variant_value == col_value);
+                    if ((valueMatches && !exclude) || (!valueMatches && exclude)) {
+                        new_data.data_map.push_back(row);
+                    }
                 }
-            }
-            else{
-                if (col_iter->second == col_value){
-                    new_data.data_map.push_back(row);
-                }
-            }
+            }, col_iter->second);
         }
     }
     return new_data;
 }
+
+// Explicit instantiation for std::string
+template data_processor data_processor::filter_data<std::string>(const std::string& col_name, const std::string& col_value, bool exclude);
+
+// Explicit instantiation for std::optional<double>
+template data_processor data_processor::filter_data<std::optional<double>>(const std::string& col_name, const std::optional<double>& col_value, bool exclude);
+
+
 
 
 
