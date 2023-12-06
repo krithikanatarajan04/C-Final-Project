@@ -61,7 +61,6 @@ data_processor Analysis::combine_dataset(data_processor set_1, data_processor se
     }
 
     data_processor combine_sets = data_processor::merge_data(set_1,set_2);
-
     return combine_sets;
 }
 
@@ -108,7 +107,7 @@ void Analysis::Community_Greenhouse_gas(){
     local_gov_fuels.read_data("../data/local-government-operations-fuels.csv", COL_TYPE_FUELS, REP_FUELS);
 
     data_processor filter_sector = local_gov_fuels.filter_data<std::string>("Sector","Buildings", false);
-
+    //filter_sector.print_data();
 
 
 
@@ -116,17 +115,16 @@ void Analysis::Community_Greenhouse_gas(){
     //step 1: combine dataset with greenhouse gas emissions
     data_processor greenhouse_gas;
     greenhouse_gas = combine_dataset(local_gov_greenhouse_gas,comm_greenhouse_gas);
-
-
-    //step 2: drop missing values
-    greenhouse_gas = greenhouse_gas.filter_data<std::optional<double>>("GHG Emissions (mt CO2e)", std::optional<double>{}, true);
-    std::cout << greenhouse_gas.data_map.size();
     //greenhouse_gas.print_data();
+    //step 2: drop missing values
+    data_processor drop_gas;
+    drop_gas = greenhouse_gas.filter_data<std::optional<double>>("GHG Emissions (mt CO2e)", std::optional<double>{}, true);
+
 
 
     //step 3: data aggregation
     std::vector<std::string> col_names = {"Year","Sector"};
-    greenhouse_gas.aggregation(col_names,"GHG Emissions (mt CO2e)");
+    //drop_gas.aggregation(col_names,"GHG Emissions (mt CO2e)");
 
 
     //data_processor cilr_data = comm_greenhouse_gas.filter_data("Sector", "Commercial/Industrial/Large Residential");

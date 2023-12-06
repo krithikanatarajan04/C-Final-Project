@@ -172,14 +172,18 @@ void data_processor::print_data() {
 
 
 // Copy constructor
-data_processor::data_processor(const data_processor& other)
-: data_map(other.data_map), COL_TYPES(other.COL_TYPES) {}
+data_processor::data_processor(const data_processor& other) {
+    this->data_map = other.data_map;
+    this->COL_TYPES = other.COL_TYPES;
+    this->headers = other.headers;
+}
 
 data_processor& data_processor::operator=(const data_processor& other){
     if (this != &other) { // Protect against self-assignment
         // Copy each member variable from 'other' to 'this'
         data_map = other.data_map;
         COL_TYPES = other.COL_TYPES;
+        headers = other.headers;
 
         // For other resources (like dynamic memory), release the current resources
         // and allocate new ones, copying the content from 'other'
@@ -192,49 +196,44 @@ bool data_processor::check_variant_type(const std::variant<int, double, std::str
     return std::holds_alternative<T>(variant);
 }
 
+// Define a helper function to compare values of different types
+template <typename T, typename U>
+bool compare_values(const T& col_value, const U& variant_value, bool exclude) {
+    // Special handling for std::optional<T> and U comparison
+    bool comparisonResult = false;
+
+    // Use std::visit to handle different types inside the variant
+    std::visit([&](const auto& value) {
+        using VariantType = std::decay_t<decltype(value)>;
+
+        // Check if the variant currently holds a type that matches T
+        if constexpr (std::is_same_v<VariantType, T>) {
+            comparisonResult = (value == col_value);
+        }
+    }, variant_value);
+
+    return (comparisonResult != exclude);
+}
+
+
 
 
 template <typename T>
 data_processor data_processor::filter_data(const std::string& col_name, const T& col_value, bool exclude) {
-    /* This function filters data for a certain value in a given column.
-     * It can either save those rows or remove those rows into a new data object
-     * Parameters:
-     * std::string col_name - name of the column to search through
-     * const& T - the value to filter by (can be any of supported variants)
-     * bool exclude (automatically set to false) - to execlude rows with given value or include rows with given value
-     *
-     * Returns:
-     * data_processor - new data_map that filters desired values
-     * */
     data_processor new_data;
-    bool is_value;
-    //iterate through current map
+    //std::cout << "Before filtering: new_data.data_map size: " << new_data.data_map.size() << std::endl;
+    //std::cout << "Type of value: " << typeid(col_value).name() << std::endl;
+
     for (const auto& row : data_map) {
         auto col_iter = row.find(col_name);
+
         if (col_iter != row.end()) {
-            //check the type of each variant and sees if it is equal
-            //if types are equal, check if the values itself are equal
-            std::visit([&](const auto& variant_value) {
-                using VariantType = std::decay_t<decltype(variant_value)>; // Deduced type in the variant
-                using ValueType = std::decay_t<decltype(col_value)>;      // Type of col_value
-
-                // Compare only if the types are the same and includes or excludes accordingly
-                if constexpr (std::is_same_v<VariantType, ValueType>) {
-                    bool valueMatches = (variant_value == col_value);
-
-                    if ((valueMatches && !exclude) || (!valueMatches && exclude)) {
-                        new_data.data_map.push_back(row);
-                    }
-                }
-            }, col_iter->second);
+            //std::cout << "Comparison result: " << compare_values(col_value, col_iter->second, exclude) << std::endl;
+            if (compare_values(col_value, col_iter->second, exclude)) {
+                new_data.data_map.push_back(row);
+            }
         }
     }
-    //replace COL_TYPES (if needed)
-    for(auto header : COL_TYPES){
-        new_data.COL_TYPES[header.first] = header.second;
-    }
-    new_data.print_data();
-    std::cout << new_data.data_map.size() << std::endl;
     return new_data;
 }
 
@@ -357,6 +356,7 @@ data_processor data_processor::merge_data(data_processor set_1, data_processor s
             combined_sets.COL_TYPES[header] = it1->second;
         }
     }
+    combined_sets.headers = common_headers;
     return combined_sets;
 }
 
@@ -397,9 +397,6 @@ data_processor data_processor::aggregation(const std::vector<std::string>& col_n
                 sub_data.add_col(int_vec, col_name);
             } else if (it->second == "double") {
                 std::vector<double> double_vec = extract_column<double>(col_name);
-                for(auto v : double_vec){
-                    std::cout << v << std::endl;
-                }
                 sub_data.add_col(double_vec, col_name);
             } else {
                 std::vector<std::string> string_vec = extract_column<std::string>(col_name);
