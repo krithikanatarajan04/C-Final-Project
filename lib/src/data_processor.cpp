@@ -231,6 +231,20 @@ template data_processor data_processor::filter_data<std::optional<double>>(const
 
 template data_processor data_processor::filter_data<std::optional<std::string>>(const std::string&, const std::optional<std::string>&, bool);
 
+std::vector<std::string> data_processor::get_headers(){
+    /* This function returns the headers for a data set
+     * */
+    return headers;
+}
+
+std::map<std::string, std::string> data_processor::get_col_types(){
+    return COL_TYPES;
+}
+
+std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>> data_processor::get_replacement_map(){
+    return REPLACEMENTS;
+}
+
 
 
 
