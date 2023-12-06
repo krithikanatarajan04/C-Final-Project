@@ -46,16 +46,36 @@ void visualization::histogram(std::vector<double> data, const std::string& title
 
 void visualization::bar_chart(std::vector<double> x , std::vector<double> y,const std::string& title, const std::string& x_label, const std::string& y_label, std::vector<std::string> category){
     /* This function takes x and y datapoints and displays a bar chart
+     * x - represents years
+     * y - represents the values
+     * categories - buckets for colors
      * */
-    matplot::bar(x,y);
+    //generate color map
 
+}
 
-    //labels
+void visualization::time_series(
+        const std::unordered_map<std::string, std::vector<double>>& data,
+        const std::vector<double>& x_values,
+        const std::vector<std::string>& labels,
+        const std::string& title,
+        const std::string& x_label,
+        const std::string& y_label
+)
+{
+    //traverse through each label
+    matplot::hold(matplot::on);
+    for (const auto& [key, value] : data) {
+        auto line = matplot::plot(x_values, value);
+        line->display_name(key); // Use the label for the legend
+        line->line_width(2);
+    }
+    matplot::hold(matplot::off);
+
     matplot::title(title);
     matplot::xlabel(x_label);
     matplot::ylabel(y_label);
-
-    // Display the plot
+    matplot::legend();
     matplot::show();
 }
 

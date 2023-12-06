@@ -20,6 +20,15 @@ public:
     void histogram(std::vector<double> data, const std::string& title = "", const std::string& x_label = "", const std::string& y_label = "");
     void bar_chart(std::vector<double> x , std::vector<double> y,const std::string& title = "", const std::string& x_label = "", const std::string& y_label = "" , std::vector<std::string> category={});
 
+    static void time_series(
+            const std::unordered_map<std::string, std::vector<double>>& data,
+            const std::vector<double>& x_values,
+            const std::vector<std::string>& labels,
+            const std::string& title ="",
+            const std::string& x_label="",
+            const std::string& y_label=""
+    );
+
 };
 
 

@@ -110,7 +110,7 @@ void Analysis::Community_Greenhouse_gas(){
 
     local_gov_fuels.read_data("../data/local-government-operations-fuels.csv", COL_TYPE_FUELS, REP_FUELS);
     local_gov_fuels = local_gov_fuels.filter_data("Quantity", std::optional<double>{}, true);
-    local_gov_fuels.print_data();
+    //local_gov_fuels.print_data();
 
 
 
@@ -124,36 +124,48 @@ void Analysis::Community_Greenhouse_gas(){
     //step 2: data aggregation
     std::vector<std::string> col_names = {"Year","Sector"};
     greenhouse_gas = greenhouse_gas.aggregation(col_names,"GHG Emissions (mt CO2e)");
+   // greenhouse_gas.print_data();
+
+
+    //TIME SERIES
+    //Step 3: filter data (remove extraneous zeros)
+    greenhouse_gas = greenhouse_gas.filter_data("GHG Emissions (mt CO2e)", 0, true);
     greenhouse_gas.print_data();
 
     //step 3 : visualization prep
-    std::vector<double> hist_x = greenhouse_gas.extract_column<double>("Year");
-    std::vector<double> hist_y = greenhouse_gas.extract_column<double>("GHG Emissions (mt CO2e)");
+    std::vector<double> years = greenhouse_gas.extract_column<double>("Year");
+    std::sort(years.begin(), years.end());
+    years.erase(std::unique(years.begin(), years.end()), years.end());
 
     std::vector<std::string> sector = greenhouse_gas.extract_column<std::string>("Sector");
     std::sort(sector.begin(), sector.end());
     sector.erase(std::unique(sector.begin(), sector.end()), sector.end());
 
-    //step 4:
-
-    // Sort the vector to bring duplicates together
-    std::sort(hist_x.begin(), hist_x.end());
-
-    // Use std::unique to rearrange the duplicates and get the end iterator of unique values
-    auto uniqueEnd = std::unique(hist_x.begin(), hist_x.end());
-
-    // Erase the duplicates from the vector using the uniqueEnd iterator
-    hist_x.erase(uniqueEnd, hist_x.end());
-
-
-    visualizer.bar_chart(hist_x,hist_y,"Greenhouse Gas Emissions over Time","Time", "Emissions");
+    //create data types for visuals
 
 
 
-    //visualizer.histogram()
-    //data_processor cilr_data = comm_greenhouse_gas.filter_data("Sector", "Commercial/Industrial/Large Residential");
-    //std::vector<double> Commercial_Industrial_Large_Residential = cilr_data.extract_column<double>("GHG Emissions (mt CO2e)");
+    std::unordered_map<std::string, std::vector<double>> emission;
+    std::vector<double> year;
+    for (const auto& label : sector) {
+        // Check if the 'Sector' and 'GHG Emissions (mt CO2e)' fields exist and have the correct type
 
-    //visualizer.histogram(Commercial_Industrial_Large_Residential);
-}
+        data_processor time_series_data;
+        time_series_data = greenhouse_gas.filter_data("Sector", label);
+        std::vector<double> emissions = time_series_data.extract_column<double>("GHG Emissions (mt CO2e)");
+        year = time_series_data.extract_column<double>("Year");
+        emission[label] = emissions; // Append to the vector
+        }
+
+
+    visualizer.time_series(emission,year,sector, "Emissions by Sector over time", "Time (Years)", "Emissions (mt CO2e)");
+    }
+
+
+
+
+
+
+
+    //step 3:
 
