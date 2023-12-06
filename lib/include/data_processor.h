@@ -69,7 +69,7 @@ public:
     data_processor();
     ~data_processor();
 
-    data_processor add_data(data_processor new_data, std::vector<std::string> common_headers);
+    data_processor merge_data(data_processor new_data, std::vector<std::string> common_headers);
 
     void replace_data(size_t row_index, const std::string &col_name, const std::string &rep_val,
                       const std::variant<int, double, std::string> &new_val);
@@ -77,6 +77,7 @@ public:
     template <typename T>
     bool check_variant_type(const std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> variant);
 
+    std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>> get_replacement_map();
 };
 
 #endif //C_FINAL_PROJECT_DATA_PROCESSOR_H

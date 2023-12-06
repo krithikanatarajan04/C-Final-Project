@@ -245,6 +245,35 @@ std::map<std::string, std::pair<std::string, std::variant<int, double, std::stri
     return REPLACEMENTS;
 }
 
+data_processor data_processor::merge_data(data_processor new_data, std::vector<std::string> common_headers) {
+    /* This function adds a set of data to another data_set given a common set of headers
+     * Parameters:
+     * data_processer new_data - the new data to be added
+     * Returns:
+     * data_processor combined_sets - the new combined data_sets
+     * */
+
+    data_processor combined_sets;
+    // Traverse through new_data's data_map
+    for (const auto& row : new_data.data_map) {
+        std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>> place_holder;
+        // Process each header in the current row
+        for (const auto& current_header : common_headers) {
+            auto it = row.find(current_header);
+            if (it != row.end()) {
+                // Add the found data to the place_holder map
+                place_holder[current_header] = it->second;
+            }
+        }
+
+        // Add the processed row to the combined_sets data map
+        combined_sets.data_map.push_back(place_holder);
+    }
+
+    return combined_sets;
+}
+
+
 
 
 
