@@ -23,28 +23,44 @@ private:
 
     std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>
     typecast_value(std::string header, const std::string value);
+    std::vector<std::string> parse_csv_line(const std::string& line);
+    void add_data(data_processor set, std::vector<std::string> common_headers);
 
 public:
-    std::map<std::string, std::string> get_col_types();
 
+    //initialization
     std::vector<std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>> data_map;
-
-    std::vector<std::string> parse_csv_line(const std::string& line);
-    void read_data(std::string csv_path,std::map<std::string, std::string> col_types, const std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string> >>> replacements = {});
-    //map: key:column name, value: pair - (value to replace, new value(int,double,string, optional int double or string)
-
     // Copy constructor
     data_processor(const data_processor& other);
-
-    // Copy assignment operator
     data_processor& operator=(const data_processor& other);
+    data_processor(std::vector<std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>>& data);
+    data_processor();
+    ~data_processor();
 
 
-    void print_data();
 
+    //getter functions
+    std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>> get_replacement_map();
+    std::map<std::string, std::string> get_col_types();
     std::vector<std::string> get_headers();
 
-    data_processor(std::vector<std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>>& data);
+
+
+
+    //executive actions
+    void read_data(std::string csv_path,std::map<std::string, std::string> col_types, const std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string> >>> replacements = {});
+    //map: key:column name, value: pair - (value to replace, new value(int,double,string, optional int double or string)
+    void print_data();
+    template <typename T>
+    data_processor filter_data(const std::string& col_name, const T& col_value, bool exclude=false);
+    static data_processor merge_data(data_processor set_1, data_processor set_2);
+    void update_header(int header_idx, std::string new_header);
+
+    template <typename T>
+    void add_col(const std::vector<T>& vec, const std::string& col_name);
+
+    data_processor aggregation(const std::vector<std::string>& col_names, const std::string& sum_col);
+    data_processor get_subset(const std::vector<std::string>& col_names);
 
     template<typename T>
     std::vector<T> extract_column(std::string col_name) {
@@ -68,30 +84,14 @@ public:
         return col_data;
     }
 
-    template <typename T>
-    data_processor filter_data(const std::string& col_name, const T& col_value, bool exclude=false);
-    data_processor();
-    ~data_processor();
 
 
-    void add_data(data_processor set, std::vector<std::string> common_headers);
-    static data_processor merge_data(data_processor set_1, data_processor set_2);
 
-    void replace_data(size_t row_index, const std::string &col_name, const std::string &rep_val,
-                      const std::variant<int, double, std::string> &new_val);
 
-    template <typename T>
-    bool check_variant_type(const std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> variant);
 
-    std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>> get_replacement_map();
-    void update_header(int header_idx, std::string new_header);
 
-    template <typename T>
-    void add_col(const std::vector<T>& vec, const std::string& col_name);
 
-    data_processor aggregation(const std::vector<std::string>& col_names, const std::string& sum_col);
 
-    data_processor get_subset(const std::vector<std::string>& col_names);
 };
 
 #endif //C_FINAL_PROJECT_DATA_PROCESSOR_H
