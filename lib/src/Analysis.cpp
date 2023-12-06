@@ -13,6 +13,7 @@
 #include <variant>
 #include <map>
 #include <optional>
+#include <set>
 
 Analysis::Analysis() {
 
@@ -125,9 +126,28 @@ void Analysis::Community_Greenhouse_gas(){
     greenhouse_gas = greenhouse_gas.aggregation(col_names,"GHG Emissions (mt CO2e)");
     greenhouse_gas.print_data();
 
-    //step 3 : visualization
+    //step 3 : visualization prep
     std::vector<double> hist_x = greenhouse_gas.extract_column<double>("Year");
     std::vector<double> hist_y = greenhouse_gas.extract_column<double>("GHG Emissions (mt CO2e)");
+
+    std::vector<std::string> sector = greenhouse_gas.extract_column<std::string>("Sector");
+    std::sort(sector.begin(), sector.end());
+    sector.erase(std::unique(sector.begin(), sector.end()), sector.end());
+
+    //step 4:
+
+    // Sort the vector to bring duplicates together
+    std::sort(hist_x.begin(), hist_x.end());
+
+    // Use std::unique to rearrange the duplicates and get the end iterator of unique values
+    auto uniqueEnd = std::unique(hist_x.begin(), hist_x.end());
+
+    // Erase the duplicates from the vector using the uniqueEnd iterator
+    hist_x.erase(uniqueEnd, hist_x.end());
+
+
+    visualizer.bar_chart(hist_x,hist_y,"Greenhouse Gas Emissions over Time","Time", "Emissions");
+
 
 
     //visualizer.histogram()

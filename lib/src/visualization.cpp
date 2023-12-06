@@ -44,4 +44,19 @@ void visualization::histogram(std::vector<double> data, const std::string& title
     matplot::show();
 }
 
+void visualization::bar_chart(std::vector<double> x , std::vector<double> y,const std::string& title, const std::string& x_label, const std::string& y_label, std::vector<std::string> category){
+    /* This function takes x and y datapoints and displays a bar chart
+     * */
+    matplot::bar(x,y);
+
+
+    //labels
+    matplot::title(title);
+    matplot::xlabel(x_label);
+    matplot::ylabel(y_label);
+
+    // Display the plot
+    matplot::show();
+}
+
 
