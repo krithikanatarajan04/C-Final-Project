@@ -14,11 +14,24 @@ Using the Matplotplusplus library, I have created methods that help display the 
 
 ## Building and Compiling
 The csv.h header file should be included in my files. For everything to compile and build properly, make sure to download a zip of the Matplotplusplus files and save it within the repository.
+CMake Version Requirement:
 
-## Documentation
+The project requires at least CMake version 3.20.
+Project Configuration:
+C++17 standard is set for the project.
 
+Executable Target:
+The source files main.cpp, data_processor.cpp, visualization.cpp, and Analysis.cpp, along with their corresponding header files, are included in the executable.
+Matplot++ Library:
+The project includes the matplotplusplus-master directory, presumably containing the Matplot++ library for plotting.
 
-## VISUALS
+Threading Library:
+There is a preference set for the pthread library, and the Threads package is required.
+The Threads library is linked with your project.
+Linking Libraries:
+
+The matplot and Threads::Threads libraries are linked to your project.
+TO run the visualization, simply run main and the graph and final table used will appear. 
 
 
 ## Sources:
