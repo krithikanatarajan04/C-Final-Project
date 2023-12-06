@@ -11,6 +11,7 @@
 #include <variant>
 #include <vector>
 #include <optional>
+#include <algorithm>
 
 
 
@@ -245,17 +246,37 @@ std::map<std::string, std::pair<std::string, std::variant<int, double, std::stri
     return REPLACEMENTS;
 }
 
-data_processor data_processor::merge_data(data_processor new_data, std::vector<std::string> common_headers) {
-    /* This function adds a set of data to another data_set given a common set of headers
+std::vector<std::string> find_common_headers(std::vector<std::string> head_1, std::vector<std::string> head_2){
+    /* This function finds the common headers between two datasets
      * Parameters:
-     * data_processer new_data - the new data to be added
-     * Returns:
-     * data_processor combined_sets - the new combined data_sets
+     * std::vector<std::string> - headers 1
+     * std::vector<std::string> - headers 2
+     * Returns::
+     * std::vector<std::string> - commmon headers
      * */
+    //check which headers from each dataset are the same and extract those headers
 
-    data_processor combined_sets;
+
+    //find common headers
+    std::sort(head_1.begin(), head_1.end());
+    std::sort(head_2.begin(), head_2.end());
+    std::vector<std::string> common_headers;
+    //add headers to new data map
+    // Find the intersection of the two sets
+    std::set_intersection(
+            head_1.begin(), head_1.end(),
+            head_2.begin(), head_2.end(),
+            std::back_inserter(common_headers));
+
+    return common_headers;
+}
+
+void data_processor::add_data(data_processor set, std::vector<std::string> common_headers){
+    /*This function traverse through a dataset and adds it to another one
+     * Parameters:
+     * */
     // Traverse through new_data's data_map
-    for (const auto& row : new_data.data_map) {
+    for (const auto& row : set.data_map) {
         std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>> place_holder;
         // Process each header in the current row
         for (const auto& current_header : common_headers) {
@@ -265,11 +286,35 @@ data_processor data_processor::merge_data(data_processor new_data, std::vector<s
                 place_holder[current_header] = it->second;
             }
         }
-
         // Add the processed row to the combined_sets data map
-        combined_sets.data_map.push_back(place_holder);
+        this->data_map.push_back(place_holder);
     }
+}
 
+void data_processor::update_header(int header_idx, std::string new_header){
+    /* This function takes in the header index and replaces the header at that spot with a new header
+     * Parameters:
+     * int header_idx - index to replace at
+     * std::string new_header - what to replace header with
+     * */
+    this->headers[header_idx] = new_header;
+}
+
+data_processor data_processor::merge_data(data_processor set_1, data_processor set_2) {
+    /* This function adds a set of data to another data_set given a common set of headers
+     * Parameters:
+     * data_processer new_data - the new data to be added
+     * Returns:
+     * data_processor combined_sets - the new combined data_sets
+     * */
+    data_processor combined_sets;
+    std::vector<std::string> set_1_headers = set_1.get_headers();
+    std::vector<std::string> set_2_headers = set_2.get_headers();
+    std::vector<std::string> common_headers = find_common_headers(set_1_headers, set_2_headers);
+
+
+    combined_sets.add_data(set_1,common_headers);
+    combined_sets.add_data(set_2,common_headers);
     return combined_sets;
 }
 

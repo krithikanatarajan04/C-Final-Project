@@ -69,7 +69,9 @@ public:
     data_processor();
     ~data_processor();
 
-    data_processor merge_data(data_processor new_data, std::vector<std::string> common_headers);
+
+    void add_data(data_processor set, std::vector<std::string> common_headers);
+    static data_processor merge_data(data_processor set_1, data_processor set_2);
 
     void replace_data(size_t row_index, const std::string &col_name, const std::string &rep_val,
                       const std::variant<int, double, std::string> &new_val);
@@ -78,6 +80,8 @@ public:
     bool check_variant_type(const std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> variant);
 
     std::map<std::string, std::pair<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>>> get_replacement_map();
+    void update_header(int header_idx, std::string new_header);
+
 };
 
 #endif //C_FINAL_PROJECT_DATA_PROCESSOR_H
