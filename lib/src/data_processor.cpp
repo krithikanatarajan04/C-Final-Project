@@ -221,19 +221,18 @@ bool compare_values(const T& col_value, const U& variant_value, bool exclude) {
 template <typename T>
 data_processor data_processor::filter_data(const std::string& col_name, const T& col_value, bool exclude) {
     data_processor new_data;
-    //std::cout << "Before filtering: new_data.data_map size: " << new_data.data_map.size() << std::endl;
-    //std::cout << "Type of value: " << typeid(col_value).name() << std::endl;
 
     for (const auto& row : data_map) {
         auto col_iter = row.find(col_name);
 
         if (col_iter != row.end()) {
-            //std::cout << "Comparison result: " << compare_values(col_value, col_iter->second, exclude) << std::endl;
             if (compare_values(col_value, col_iter->second, exclude)) {
                 new_data.data_map.push_back(row);
             }
         }
     }
+    new_data.COL_TYPES = this->COL_TYPES;
+    new_data.headers = this->headers;
     return new_data;
 }
 
@@ -362,10 +361,7 @@ data_processor data_processor::merge_data(data_processor set_1, data_processor s
 
 template <typename T>
 void data_processor::add_col(const std::vector<T>& vec, const std::string& col_name){
-    // initialize data_map to correct number of rows if empty
-    if (this->data_map.empty()) {
-        this->data_map.resize(vec.size());
-    }
+
 
     // Ensure data_map has enough rows to add new column data
     if (this->data_map.size() < vec.size()) {
@@ -386,16 +382,19 @@ template void data_processor::add_col<std::string>(const std::vector<std::string
 
 
 data_processor data_processor::aggregation(const std::vector<std::string>& col_names, const std::string& sum_col) {
+    std::vector<std::string> all_cols;
+    all_cols = col_names;
+    all_cols.push_back(sum_col);
+
     data_processor sub_data;
-
-
-    for (const auto& col_name : col_names) {
+    for (const auto& col_name : all_cols) {
         auto it = COL_TYPES.find(col_name);
         if (it != COL_TYPES.end()) {
             if (it->second == "int") {
                 std::vector<int> int_vec = extract_column<int>(col_name);
                 sub_data.add_col(int_vec, col_name);
-            } else if (it->second == "double") {
+            }
+            else if (it->second == "double") {
                 std::vector<double> double_vec = extract_column<double>(col_name);
                 sub_data.add_col(double_vec, col_name);
             } else {
@@ -407,12 +406,57 @@ data_processor data_processor::aggregation(const std::vector<std::string>& col_n
             sub_data.add_col(default_vec, col_name);
         }
     }
-    sub_data.print_data();
-    //sum by specified column
-    //data_processor aggregate;
+
+    // sum by specified column
+    data_processor aggregate;
+
+    for (auto row : sub_data.data_map) {
+        bool is_there = false;
+
+        // Iterate through aggregate data_map to check if the value combo is already there
+        for (auto& r : aggregate.data_map) {
+            bool match = true;
+
+            // Compare all keys EXCEPT THE SUM COLUMN
+            for (auto col : col_names) {
+                auto big = row.find(col);
+                auto a = r.find(col);
+
+                if (a != r.end() && big != row.end() && a->second != big->second) {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match) {
+                // Perform addition based on the actual types within the variants
+                if (r[sum_col].index() == 0 && row[sum_col].index() == 0) {
+                    // Both values are of type int
+                    std::get<int>(r[sum_col]) += std::get<int>(row[sum_col]);
+                } else if (r[sum_col].index() == 1 && row[sum_col].index() == 1) {
+                    // Both values are of type double
+                    std::get<double>(r[sum_col]) += std::get<double>(row[sum_col]);
+                }
+                // Add more cases for other types as needed...
+
+                is_there = true;
+                break;
+            }
+        }
+
+        if (!is_there) {
+            // Insert a new data row into aggregate
+            std::map<std::string, std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>>> place;
+            for (auto col : all_cols) {
+                place[col] = row[col];
+            }
+            aggregate.data_map.push_back(place);
+        }
+    }
 
 
-    return sub_data;
+    return aggregate;
+
 }
 
 

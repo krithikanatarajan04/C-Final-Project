@@ -55,10 +55,8 @@ public:
          * std::vector - column of data
          * */
         std::vector<T> col_data;
-        std::cout << "data_map size: " << data_map.size() << std::endl;
 
         for (const auto row: data_map) {
-            std::cout << col_name << std::endl;
             auto col_iter = row.find(col_name);
             if (col_iter != row.end()) {
                 if (std::holds_alternative<T>(col_iter->second)) {
