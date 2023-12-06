@@ -68,6 +68,8 @@ void Analysis::Community_Greenhouse_gas(){
 
     local_gov_fuels.read_data("../data/local-government-operations-fuels.csv", COL_TYPE_FUELS, REP_FUELS);
     local_gov_fuels.print_data();
+
+
     //COMBINE DATASETS USING SIMILAR HEADERS
 
 
@@ -79,3 +81,4 @@ void Analysis::Community_Greenhouse_gas(){
     //visualizer.histogram(Commercial_Industrial_Large_Residential);
 
 }
+

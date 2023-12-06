@@ -122,9 +122,6 @@ void data_processor::read_data(std::string csv_path, std::map<std::string, std::
 }
 
 
-
-
-
 void data_processor::print_data() {
     /*This function prints the csv data in a readable format
      * */
@@ -172,6 +169,37 @@ void data_processor::print_data() {
         std::cout << "" << std::endl;
     }
 
+data_processor data_processor::filter_data(std::string col_name,std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> col_value, bool out) {
+
+    /* Given a column name and the associated value to filter by, this function returns
+     * a new data map object filtering for the rows that have the desired value
+     * Parameters:
+     * std::string col_name - column to search for value
+     * std::variant col_value - the value to filter by
+     * bool out (set to false) - whether to filter all rows WITH value or WITHOUT value
+     * Returns:
+     * data_processor - new data processor object with filtered data map
+     * */
+
+    data_processor new_data;
+    for (const auto &row: data_map) {
+        auto col_iter = row.find(col_name);
+        if (col_iter != row.end()) {
+            // Check if this row has the specified value
+            if(out){
+                if (col_iter->second != col_value){
+                    new_data.data_map.push_back(row);
+                }
+            }
+            else{
+                if (col_iter->second == col_value){
+                    new_data.data_map.push_back(row);
+                }
+            }
+        }
+    }
+    return new_data;
+}
 
 
 

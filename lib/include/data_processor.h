@@ -64,10 +64,8 @@ public:
         return col_data;
     }
 
-    data_processor filter_data(std::string col_name, std::variant<int, double, std::string> col_value);
-
+    data_processor filter_data(std::string col_name,std::variant<int, double, std::string, std::optional<int>, std::optional<double>, std::optional<std::string>> col_value, bool out);
     data_processor();
-
     ~data_processor();
 
     data_processor add_data(data_processor new_data, std::vector<std::string> common_headers);
