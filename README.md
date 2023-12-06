@@ -15,6 +15,9 @@ Using the Matplotplusplus library, I have created methods that help display the 
 ## Building and Compiling
 The csv.h header file should be included in my files. For everything to compile and build properly, make sure to download a zip of the Matplotplusplus files and save it within the repository.
 
+## Documentation
+
+
 ## VISUALS
 
 
