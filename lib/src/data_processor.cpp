@@ -362,8 +362,8 @@ data_processor data_processor::merge_data(data_processor set_1, data_processor s
 template <typename T>
 void data_processor::add_col(const std::vector<T>& vec, const std::string& col_name){
 
-
     // Ensure data_map has enough rows to add new column data
+
     if (this->data_map.size() < vec.size()) {
         // Expand the data_map to accommodate new rows
         this->data_map.resize(vec.size());
@@ -457,6 +457,36 @@ data_processor data_processor::aggregation(const std::vector<std::string>& col_n
 
     return aggregate;
 
+}
+data_processor data_processor::get_subset(const std::vector<std::string>& col_names){
+    /* This function takes in the desired columns and returns a subset of a larger data map
+     * Parameters:
+     * std::string - column names
+     * Returns:
+     * data processor
+     * */
+    data_processor subset;
+    //traverse through columns
+    for(auto col : col_names){
+        auto it = COL_TYPES.find(col);
+        if( it != COL_TYPES.end()){
+            if(it->second == "int"){
+                subset.add_col(this->extract_column<int>(col), col);
+            }
+            else if(it->second == "double"){
+                subset.add_col(this->extract_column<double>(col), col);
+            }
+            else{
+                subset.add_col(this->extract_column<std::string>(col), col);
+            }
+        }
+        else{
+            subset.add_col(this->extract_column<std::string>(col), col);
+        }
+    }
+    subset.headers = col_names;
+    subset.COL_TYPES = this->COL_TYPES;
+    return subset;
 }
 
 

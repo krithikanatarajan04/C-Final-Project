@@ -17,7 +17,7 @@ public:
     ~Analysis();
     void emissions_over_time_by_sector();
 
-    void local_government_operation_fuels();
+    void emissions_by_fuels();
 
 };
 

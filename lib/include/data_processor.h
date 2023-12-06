@@ -91,6 +91,7 @@ public:
 
     data_processor aggregation(const std::vector<std::string>& col_names, const std::string& sum_col);
 
+    data_processor get_subset(const std::vector<std::string>& col_names);
 };
 
 #endif //C_FINAL_PROJECT_DATA_PROCESSOR_H

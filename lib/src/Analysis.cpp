@@ -82,7 +82,7 @@ void Analysis::emissions_over_time_by_sector(){
 
     comm_greenhouse_gas.read_data("../data/community-greenhouse-gas.csv", COL_TYPES);
     comm_greenhouse_gas = comm_greenhouse_gas.filter_data("GHG Emissions (mt CO2e)", std::optional<double>{},true);
-    //comm_greenhouse_gas.print_data();
+
     std::cout << comm_greenhouse_gas.data_map.size() <<std::endl;
 
     //LOCAL GOVERNMENT GREENHOUSE GAS
@@ -98,7 +98,7 @@ void Analysis::emissions_over_time_by_sector(){
 
     local_gov_greenhouse_gas.read_data("../data/local-government-operations-greenhouse-gas.csv", COL_TYPES_1, REPLACEMENTS);
     local_gov_greenhouse_gas = local_gov_greenhouse_gas.filter_data("GHG Emissions (t CO2e)", std::optional<double>{}, true);
-    //local_gov_greenhouse_gas.print_data();
+
     std::cout << local_gov_greenhouse_gas.data_map.size() <<std::endl;
     //LOCAL GOVERNMENT OPERATIONS FUELS
     data_processor local_gov_fuels;
@@ -112,24 +112,19 @@ void Analysis::emissions_over_time_by_sector(){
 
     local_gov_fuels.read_data("../data/local-government-operations-fuels.csv", COL_TYPE_FUELS, REP_FUELS);
     local_gov_fuels = local_gov_fuels.filter_data("Quantity", std::optional<double>{}, true);
-    //local_gov_fuels.print_data();
 
 
-
-
-    //HISTOGRAM ANALYSIS
+    //TIME SERIES VISUALIZATION
     //step 1: combine dataset with greenhouse gas emissions
     data_processor greenhouse_gas;
     greenhouse_gas = combine_dataset(local_gov_greenhouse_gas,comm_greenhouse_gas);
-    //greenhouse_gas.print_data();
+
 
     //step 2: data aggregation
     std::vector<std::string> col_names = {"Year","Sector"};
     greenhouse_gas = greenhouse_gas.aggregation(col_names,"GHG Emissions (mt CO2e)");
-   // greenhouse_gas.print_data();
 
 
-    //TIME SERIES
     //Step 3: filter data (remove extraneous zeros)
     greenhouse_gas = greenhouse_gas.filter_data("GHG Emissions (mt CO2e)", 0, true);
     greenhouse_gas.print_data();
@@ -143,10 +138,8 @@ void Analysis::emissions_over_time_by_sector(){
     std::sort(sector.begin(), sector.end());
     sector.erase(std::unique(sector.begin(), sector.end()), sector.end());
 
-    //create data types for visuals
 
-
-
+    //data type needed for visualization
     std::unordered_map<std::string, std::vector<double>> emission;
     std::vector<double> year;
     for (const auto& label : sector) {
@@ -159,9 +152,34 @@ void Analysis::emissions_over_time_by_sector(){
         emission[label] = emissions; // Append to the vector
         }
 
-
     visualizer.time_series(emission,year,sector, "Emissions by Sector over time", "Time (Years)", "Emissions (mt CO2e)");
+
     }
+    void Analysis::emissions_by_fuels() {
+        data_processor comm_greenhouse_gas;
+        visualization visualizer;
+
+        //LOCAL GOVERNMENT OPERATIONS FUELS
+        data_processor local_gov_fuels;
+        std::map<std::string, std::string> COL_TYPE_FUELS = {
+                {"Year", "double"},
+                {"Quantity", "double"}
+        };
+        std::map<std::string, std::pair<std::string,std::variant<int, double, std::string, std::optional<int>,std::optional<double>,std::optional<std::string>>>> REP_FUELS = {
+                {"Quantity", {"-", std::optional<double>{}}}
+        };
+
+        local_gov_fuels.read_data("../data/local-government-operations-fuels.csv", COL_TYPE_FUELS, REP_FUELS);
+        local_gov_fuels = local_gov_fuels.filter_data("Quantity", std::optional<double>{}, true);
+
+        //HEAT MAP
+        //step 1: extract desired columns
+        //local_gov_fuels.print_data();
+
+        data_processor subset_fuel = local_gov_fuels.get_subset({"Department", "Year", "Quantity"});
+        subset_fuel.print_data();
+
+}
 
 
 
