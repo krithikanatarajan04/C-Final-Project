@@ -13,9 +13,8 @@ Many of the cells contained missing values that needed to be addressed. I replac
 Using the Matplotplusplus library, I have created methods that help display the findings from this data.
 
 ## Building and Compiling
-The csv.h header file should be included in my files. For everything to compile and build properly, make sure to download a zip of the Matplotplusplus files and save it within the repository.
-CMake Version Requirement:
 
+CMake Version Requirement:
 The project requires at least CMake version 3.20.
 Project Configuration:
 C++17 standard is set for the project.
@@ -32,6 +31,11 @@ Linking Libraries:
 
 The matplot and Threads::Threads libraries are linked to your project.
 TO run the visualization, simply run main and the graph and final table used will appear. 
+
+
+## Run Analysis
+To run this program, you will need to download a zip file from Matplotplusplus:https://github.com/alandefreitas/matplotplusplus and store in the repository directory at the same level as the Cmake.txt. Additionally, if you do not have gnuplot installed, you will need to install that on terminal. 
+The analyis code is contained within the Analysis.h and Analysis.cpp file but to run the program you will just need to run main and the final table of data used for the visualization will appear along with the visualization. 
 
 
 ## Sources:
